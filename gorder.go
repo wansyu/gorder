@@ -1,35 +1,87 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"os/exec"
-	// "time"
+
+	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	r := gin.Default()
-	// 定义路由
-	r.GET("/", func(c *gin.Context) {
-		// time.Sleep(5 * time.Second)
-		c.String(http.StatusOK, "Welcome Gin Server")
-	})
-	// 定义一个接口用于触发本地程序的执行
-	r.POST("/run-local-program", func(c *gin.Context) {
-		// 执行本地程序的命令
-		cmd := exec.Command("curl", "ip.sb")
-		output, err := cmd.CombinedOutput()
+type ProgramConfig struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+}
 
+type Config struct {
+	Key           string          `json:"key"`
+	ProgramPaths  []ProgramConfig `json:"program_paths"`
+}
+
+func main() {
+	router := gin.Default()
+
+	router.POST("/call-program", func(c *gin.Context) {
+		// 读取config.json文件
+		configData, err := ioutil.ReadFile("config.json")
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read config file"})
 			return
 		}
 
-		// 返回本地程序的输出结果
-		c.Header("Content-Type", "application/json; charset=utf-8")
-		c.JSON(http.StatusOK, gin.H{"output": string(output)})
+		// 解析config.json文件
+		var config Config
+		err = json.Unmarshal(configData, &config)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse config file"})
+			return
+		}
+
+		// 解析请求中的JSON数据
+		var requestData struct {
+			ProgramName string `json:"program_name"`
+			Key         string `json:"key"`
+		}
+		err = c.BindJSON(&requestData)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+			return
+		}
+
+		// 验证密钥
+		if config.Key != requestData.Key {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid key"})
+			return
+		}
+
+		// 查找程序路径
+		var programPath string
+		for _, program := range config.ProgramPaths {
+			if program.Name == requestData.ProgramName {
+				programPath = program.Path
+				break
+			}
+		}
+
+		if programPath == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid program name"})
+			return
+		}
+
+		// 执行本地程序
+		cmd := exec.Command(programPath)
+		err = cmd.Run()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute program"})
+			return
+		}
+
+		// 返回成功响应
+		c.JSON(http.StatusOK, gin.H{"message": "Program called successfully"})
 	})
 
-	// 启动 HTTP 服务器
-	r.Run(":8080")
+	router.Run(":8080")
 }
