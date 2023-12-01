@@ -77,7 +77,7 @@ func main() {
 		// 执行本地程序
 		cmd := exec.Command(programPath)
 		// err = cmd.Run()
-		output, err := cmd.CombinedOutput()
+		output, err := cmd.Output()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute program","output": string(output)})
 			return

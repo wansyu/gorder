@@ -12,7 +12,7 @@ data = {
 }
 
 headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json; charset=utf-8"
 }
 
 response = requests.post(url, data=json.dumps(data), headers=headers)

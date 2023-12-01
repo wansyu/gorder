@@ -2,11 +2,11 @@
     "key": "apikey",
 	"program_paths":[{
         "name": "getip",
-        "path": "./getip.bat"
+        "path": ".\\getip.bat"
 	},
     {
         "name": "getip2",
-        "path": "./getremoteip.bat"
+        "path": ".\\getremoteip.bat"
 	}
 ]
 }
