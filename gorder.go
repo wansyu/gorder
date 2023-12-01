@@ -76,14 +76,15 @@ func main() {
 
 		// 执行本地程序
 		cmd := exec.Command(programPath)
-		err = cmd.Run()
+		// err = cmd.Run()
+		output, err := cmd.CombinedOutput()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute program"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to execute program","output": string(output)})
 			return
 		}
 
 		// 返回成功响应
-		c.JSON(http.StatusOK, gin.H{"message": "Program called successfully"})
+		c.JSON(http.StatusOK, gin.H{"message": "Program called successfully ","output": string(output)})
 	})
 
 	router.Run(":8080")

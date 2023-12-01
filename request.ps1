@@ -3,11 +3,13 @@ $programName = "getip"
 
 $url = "http://localhost:8080/call-program"
 
-$body = @{
+$jsonData  = @{
     "program_name" = $programName
     "key" = $apiKey
-} | ConvertTo-Json
+} 
+$jsonData  = $jsonData  | ConvertTo-Json 
+$headers = @{ "Content-type" = "application/json" }
 
-$response = Invoke-RestMethod -Method Post -Uri $url -Body $body -ContentType "application/json"
+$response = Invoke-RestMethod  -Uri $url -Method Post -Headers $headers -Body $jsonData  
 
-Write-Host $response
+$response
