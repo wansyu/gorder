@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
+	// "os"
 	"os/exec"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,10 @@ type Config struct {
 
 func main() {
 	router := gin.Default()
-
+	// 定义路由
+	router.GET("/", func(c *gin.Context) {
+		c.String(http.StatusOK, "Welcome Gin Server")
+	})
 	router.POST("/call-program", func(c *gin.Context) {
 		// 读取config.json文件
 		configData, err := ioutil.ReadFile("config.json")
