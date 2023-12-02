@@ -2,7 +2,7 @@ name: build-go-binary
 
 on:
   release:
-    types: [created,published] # 表示在创建新的 Release 时触发
+    types: [created] # 表示在创建新的 Release 时触发
 
 jobs:
   build-go-binary:
@@ -21,5 +21,5 @@ jobs:
           github_token: ${{ secrets.GH_TOKEN }} # 一个默认的变量，用来实现往 Release 中添加文件
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          goversion: latest # 可以指定编译使用的 Golang 版本
+          goversion: 1.21.4 # 可以指定编译使用的 Golang 版本
           extra_files: README.md config.json # 需要包含的额外文件
