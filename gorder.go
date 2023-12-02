@@ -1,13 +1,14 @@
 package main
 
 import (
+	"flag"
 	"encoding/json"
 	// "fmt"
 	"io/ioutil"
 	"net/http"
 	// "os"
 	"os/exec"
-
+	"log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,14 +23,26 @@ type Config struct {
 }
 
 func main() {
+	// 解析命令行参数
+	configPath := flag.String("c", "config.json", "Path to config file")
+	ip := flag.String("ip", "", "IP address")
+	port := flag.String("p", "8080", "Port number")
+	route := flag.String("r", "/call-program", "Route path")
+	flag.Parse()
+
+	// 检查是否提供了配置文件路径
+	if *configPath == "" {
+		log.Fatal("Config file path is required")
+	}
+
 	router := gin.Default()
 	// 定义路由
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Welcome Gin Server")
 	})
-	router.POST("/call-program", func(c *gin.Context) {
+	router.POST(*route, func(c *gin.Context) {
 		// 读取config.json文件
-		configData, err := ioutil.ReadFile("config.json")
+		configData, err := ioutil.ReadFile(*configPath)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read config file"})
 			return
@@ -87,5 +100,5 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"message": "Program called successfully ","output": string(output)})
 	})
 
-	router.Run(":8080")
+	router.Run(*ip+":"+*port)
 }
