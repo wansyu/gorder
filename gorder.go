@@ -43,12 +43,13 @@ func main() {
 	// 检查是否提供了配置文件路径
 	if *configPath == "" {
 		log.Fatal("Config file path is required")
+		return
 	}
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	// 定义路由
 	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Welcome Goder Server")
+		c.String(http.StatusOK, "Welcome Gorder Server")
 	})
 	router.POST(*route, func(c *gin.Context) {
 		// 读取config.json文件
@@ -81,6 +82,8 @@ func main() {
 		encryptedDk, err := EncryptPassword(requestData.Key, []byte(config.Salt))
 		if err != nil {
 			log.Fatal(err)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err})
+			return
 		}
 		if config.Key != encryptedDk {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid key"})
