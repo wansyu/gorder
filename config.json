@@ -1,5 +1,6 @@
 {
-    "key": "apikey",
+    "key": "WzcXmcnv+hh0Ag3OKh9+4hzD6Lq0biG8MkEQa9Wo2Gw=",
+    "salt": "@#$%^&*()",
 	"program_paths":[{
         "name": "getip",
         "path": ".\\getip.bat"

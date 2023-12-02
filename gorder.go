@@ -10,6 +10,8 @@ import (
 	"os/exec"
 	"log"
 	"github.com/gin-gonic/gin"
+	"encoding/base64"
+	"golang.org/x/crypto/scrypt"
 )
 
 type ProgramConfig struct {
@@ -19,7 +21,15 @@ type ProgramConfig struct {
 
 type Config struct {
 	Key           string          `json:"key"`
+	Salt          string          `json:"salt"`
 	ProgramPaths  []ProgramConfig `json:"program_paths"`
+}
+func EncryptPassword(password string, salt []byte) (string, error) {
+	dk, err := scrypt.Key([]byte(password), salt, 1<<15, 8, 1, 32)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(dk), nil
 }
 
 func main() {
@@ -34,11 +44,11 @@ func main() {
 	if *configPath == "" {
 		log.Fatal("Config file path is required")
 	}
-
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	// 定义路由
 	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Welcome Gin Server")
+		c.String(http.StatusOK, "Welcome Goder Server")
 	})
 	router.POST(*route, func(c *gin.Context) {
 		// 读取config.json文件
@@ -68,7 +78,11 @@ func main() {
 		}
 
 		// 验证密钥
-		if config.Key != requestData.Key {
+		encryptedDk, err := EncryptPassword(requestData.Key, []byte(config.Salt))
+		if err != nil {
+			log.Fatal(err)
+		}
+		if config.Key != encryptedDk {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid key"})
 			return
 		}

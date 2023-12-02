@@ -1,7 +1,7 @@
 import requests
 import json
 
-apiKey = "apikey"
+apiKey = "somepassword"
 programName = "getip"
 
 url = "http://localhost:8080/call-program"
