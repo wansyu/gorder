@@ -33,20 +33,23 @@ func EncryptPassword(password string, salt []byte) (string, error) {
 	}
 	return base64.StdEncoding.EncodeToString(dk), nil
 }
-func loadConfig(configPath string) Config {
+func loadConfig(configPath string) (Config, error) {
 	// 读取配置文件
 	file, err := ioutil.ReadFile(configPath)
+	var ramConfig Config
 	if err != nil {
 		log.Fatalf("Error reading config file: %v", err)
+		return ramConfig, err
 	}
 
 	// 解析配置文件
 	var config Config
 	if err := json.Unmarshal(file, &config); err != nil {
 		log.Fatalf("Error parsing config file: %v", err)
+		return ramConfig, err
 	}
 
-	return config
+	return config, nil
 }
 func main() {
 	// 解析命令行参数
@@ -62,13 +65,22 @@ func main() {
 		return
 	}
 	// 加载配置文件
-	config := loadConfig(*configPath)
+	config, cerr := loadConfig(*configPath)
+
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	// 定义路由
 	router.GET("/", func(c *gin.Context) {
+		if cerr != nil {
+			c.String(http.StatusOK, "Error Gorder Server")
+			return
+		}
 		c.String(http.StatusOK, "Welcome Gorder Server")
 	})
+	if cerr != nil {
+		log.Fatalf("error: Loading JSON data: %v", cerr)
+		return
+	}
 	router.POST(*route, func(c *gin.Context) {
 		// 解析请求中的JSON数据
 		var requestData struct {
