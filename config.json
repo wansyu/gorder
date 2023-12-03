@@ -2,12 +2,14 @@
     "key": "WzcXmcnv+hh0Ag3OKh9+4hzD6Lq0biG8MkEQa9Wo2Gw=",
     "salt": "@#$%^&*()",
 	"program_paths":[{
-        "name": "getip",
-        "path": ".\\getip.bat"
+        "name": "getip0",
+        "path": "curl",
+        "args": ["ip.sb"]
 	},
     {
-        "name": "getip2",
-        "path": ".\\getremoteip.bat"
+        "name": "getip1",
+        "path": "curl",
+        "args": ["-x","socks5://127.0.0.1:1080","ip.sb"]
 	}
 ]
 }
