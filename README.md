@@ -68,8 +68,8 @@ Example `config.json`:
   "key": "your-server-key",
   "salt": "your-salt-value",
   "program_paths": [
-    {"name": "program1", "path": "/path/to/program1"},
-    {"name": "program2", "path": "/path/to/program2"}
+    {"name": "program1", "path": "/path/to/program1", "args": ["arg0"]},
+    {"name": "program2", "path": "/path/to/program2", "args": ["arg0", "arg1"]}
   ]
 }
 ```
