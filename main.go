@@ -45,7 +45,7 @@ func InitializeConfig(configPath string) {
 		{
 			Name: "getip1",
 			Path: "curl",
-			Args: []string{"-x", "socks5://127.0.0.1:1080", "ip.sb"},
+			Args: []string{"-4", "ip.sb"},
 		},
 	}
 	// write the ramConfig to the file configPath
